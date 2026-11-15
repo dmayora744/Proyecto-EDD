@@ -57,7 +57,7 @@ public class GrafoPonderado {
         vDestino.getAdyacentes().agregar(new Arista(origen, tiempo));
     }
     
-    public Object getVertices(){
+    public ListaEnlazada getVertices(){
         return vertices;
     }
     

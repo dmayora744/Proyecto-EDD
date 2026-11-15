@@ -22,6 +22,11 @@ public class ListaEnlazada {
         return cabeza;
     }
     
+    /**
+     * 
+     * @param contenido 
+     */
+    
     //Método para agreagr un elemento al final de la lista
     public void agregar(Object contenido){
         NodoLista nuevoNodo = new NodoLista(contenido);
@@ -33,9 +38,9 @@ public class ListaEnlazada {
             while (actual.getSiguiente() != null){
                 actual = actual.getSiguiente();
             }
-            tamano++;
+            actual.setSiguiente(nuevoNodo);
         }
-    
+        tamano++;
         }
     //Método para eliminar un nodo específico
     public void eliminar(Object contenido){

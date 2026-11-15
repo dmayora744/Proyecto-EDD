@@ -10,7 +10,7 @@ package proyectoedd;
  */
 public class Arista {
     private final String idDestino;
-    private final int tiempoMinutos;
+    private int tiempoMinutos;
     
     public Arista(String idDestino, int tiempoMinutos){
         this.idDestino = idDestino;
@@ -26,7 +26,7 @@ public class Arista {
     }
 
     void setTiempo(int nuevoTiempo) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        this.tiempoMinutos = nuevoTiempo;
     }
     
    

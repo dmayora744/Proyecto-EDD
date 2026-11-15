@@ -5,36 +5,27 @@
 package proyectoedd;
 
 /**
- *
+ *representa una estaciòn (parada) de la red de transporte multi modal.
  * @author ile1
  */
 public class Estacion {
-
-    public Estacion(String id, String nombre, String lineaMetro, String zona, int capacidad) {
-    }
-
-    String getID() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    String getNombre() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    String getLinea() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    String getZona() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    String getCapacidad() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    String getLineaMetro() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    private String id;
+    private String nombre;
+    private String linea;
+    private String zona;
+    private int capcacidad;
+    
+    public Estacion(String id, String nombre, String linea, String zona, int capacidad){
+        this.id = id;
+        this.nombre = nombre;
+        this.linea = linea;
+        this.zona = zona;
+        this.capcacidad = capacidad;
     }
     
+    public String getID() {return id;}
+    public String getNombre() {return nombre;}
+    public String getLinea() {return linea; }
+    public String getZona() {return zona;}
+    public int getCapacidad() {return capcacidad; }
 }

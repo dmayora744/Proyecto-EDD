@@ -28,6 +28,10 @@ public class Interfaz extends javax.swing.JPanel {
         initComponents();
 }
 
+    public void setEstructuras(TablaHash tablaHash, GrafoPonderado grafo){
+        this.tablaHash = tablaHash;
+        this.grafo = grafo;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -104,7 +108,7 @@ public class Interfaz extends javax.swing.JPanel {
             Estacion est = tablaHash.buscar(nombreEstacion.trim());
             
             if (est != null){
-                JOptionPane.showMessageDialog(this, "Estación encontrada: " + est.getNombre() + "\nLínea: " + est.getLineaMetro());
+                JOptionPane.showMessageDialog(this, "Estación encontrada: " + est.getNombre() + "\nLínea: " + est.getLinea());
             
             }else{
                 JOptionPane.showMessageDialog(this, "Estación no encontrada.", "Error", JOptionPane.ERROR_MESSAGE);

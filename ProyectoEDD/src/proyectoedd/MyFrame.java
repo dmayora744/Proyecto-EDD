@@ -1,4 +1,5 @@
 
+
 package proyectoedd;
 
 import java.awt.FlowLayout;
@@ -17,6 +18,7 @@ public class MyFrame extends JFrame implements ActionListener{
             
     //Componentes de la interfaz
     private JButton buttonCargar;
+    private Interfaz panelInterfaz;
     
     //Estructuras de datos principales
     private TablaHash tablaHash;
@@ -36,7 +38,7 @@ public class MyFrame extends JFrame implements ActionListener{
         this.hayDatosEnMemoria = false;
         
         //Interfaz gráfica al JFrame
-        Interfaz panelInterfaz = new Interfaz(this.tablaHash, this.grafo);
+        panelInterfaz = new Interfaz(this.tablaHash, this.grafo);
         this.add(panelInterfaz);
         
         //Configuración básica del JFrame
@@ -70,8 +72,6 @@ public class MyFrame extends JFrame implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         
-         
-        
         if (e.getSource() == buttonCargar){
             //Ejecutar la alerta
             if(!verificarCambiosSinGuardar()){
@@ -86,12 +86,16 @@ public class MyFrame extends JFrame implements ActionListener{
             if (response == JFileChooser.APPROVE_OPTION){
                 File archivoSeleccionado = fileChooser.getSelectedFile();
                 
-                this.tablaHash = new TablaHash(101);
-                this.grafo = new GrafoPonderado();
+                //Se carga en estructuras nuevas; solo se reemplazan si todo sale bien
+                TablaHash nuevaTabla = new TablaHash(101);
+                GrafoPonderado nuevoGrafo = new GrafoPonderado();
                 
-                boolean exito = LectorCSV.cargarArchivo(archivoSeleccionado, this.tablaHash, this.grafo);
+                boolean exito = LectorCSV.cargarArchivo(archivoSeleccionado, nuevaTabla, nuevoGrafo);
                 
                 if (exito){
+                    this.tablaHash = nuevaTabla;
+                    this.grafo = nuevoGrafo;
+                    this.panelInterfaz.setEstructuras(this.tablaHash, this.grafo);
                     this.hayDatosEnMemoria = true;
                     JOptionPane.showMessageDialog(
                             this,
@@ -100,8 +104,10 @@ public class MyFrame extends JFrame implements ActionListener{
                             JOptionPane.INFORMATION_MESSAGE
                     );
                 }
-                else if(e.getSource() == buttonGuardar){
-               if (!hayDatosEnMemoria) {
+            }
+        }
+        else if(e.getSource() == buttonGuardar){
+            if (!hayDatosEnMemoria) {
                 JOptionPane.showMessageDialog(this, "No hay datos en memoria para guardar.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -124,7 +130,7 @@ public class MyFrame extends JFrame implements ActionListener{
                     
                     writerGuardar.println("ID_Estacion,Nombre_Estacion,Linea,Zona,Capacidad_Pasajeros_Hora");
 
-                    NodoLista actualV = ((ListaEnlazada) grafo.getVertices()).getCabeza();
+                    NodoLista actualV = grafo.getVertices().getCabeza();
                     while (actualV != null) {
                         Vertice v = (Vertice) actualV.getContenido(); 
                         String id = v.getIdEstacion();
@@ -139,8 +145,7 @@ public class MyFrame extends JFrame implements ActionListener{
                     writerGuardar.println();
                     writerGuardar.println("Estacion_Origen,Estacion_Destino,Tiempo_Traslado_Min");
 
-                    actualV = ((ListaEnlazada) grafo.getVertices()).getCabeza();
-                    String aristasImpresas = ""; 
+                    actualV = grafo.getVertices().getCabeza();
 
                     while (actualV != null) {
                         Vertice v = (Vertice) actualV.getContenido();
@@ -151,9 +156,9 @@ public class MyFrame extends JFrame implements ActionListener{
                             String origen = v.getIdEstacion();
                             String destino = a.getIdDestino();
                             
-                            if (!aristasImpresas.contains(destino + "-" + origen)) {
+                            //Cada conexión está en ambos vértices: se imprime una sola vez
+                            if (origen.compareTo(destino) < 0) {
                                 writerGuardar.println(origen + "," + destino + "," + a.getTiempoMinutos());
-                                aristasImpresas += origen + "-" + destino + ",";
                             }
                             
                             actualArista = actualArista.getSiguiente();
@@ -168,7 +173,5 @@ public class MyFrame extends JFrame implements ActionListener{
                 }
             }
         }
-        }  
-        }
-        }
     }  
+}
