@@ -46,6 +46,8 @@ public class Interfaz extends javax.swing.JPanel {
         NuevaEst = new javax.swing.JButton();
         NuevaConexion = new javax.swing.JButton();
         ModTiempo = new javax.swing.JButton();
+        EliminarEst = new javax.swing.JButton();
+        EliminarCon = new javax.swing.JButton();
 
         BuscarEst.setText("Buscar Estación");
         BuscarEst.addActionListener(this::BuscarEstActionPerformed);
@@ -59,20 +61,35 @@ public class Interfaz extends javax.swing.JPanel {
         ModTiempo.setText("Modificar Tiempo");
         ModTiempo.addActionListener(this::ModTiempoActionPerformed);
 
+        EliminarEst.setText("Eliminar Estación");
+        EliminarEst.addActionListener(this::EliminarEstActionPerformed);
+
+        EliminarCon.setText("Eliminar Conexión");
+        EliminarCon.addActionListener(this::EliminarConActionPerformed);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(60, 60, 60)
-                .addComponent(BuscarEst)
-                .addGap(72, 72, 72)
-                .addComponent(NuevaEst)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
-                .addComponent(NuevaConexion)
-                .addGap(53, 53, 53)
-                .addComponent(ModTiempo)
-                .addGap(49, 49, 49))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(EliminarEst)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(BuscarEst)
+                        .addGap(72, 72, 72)
+                        .addComponent(NuevaEst)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
+                        .addComponent(NuevaConexion)
+                        .addGap(53, 53, 53)
+                        .addComponent(ModTiempo)
+                        .addGap(49, 49, 49))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(118, 118, 118)
+                        .addComponent(EliminarCon)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -83,7 +100,11 @@ public class Interfaz extends javax.swing.JPanel {
                     .addComponent(NuevaEst)
                     .addComponent(NuevaConexion)
                     .addComponent(ModTiempo))
-                .addContainerGap(483, Short.MAX_VALUE))
+                .addGap(94, 94, 94)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(EliminarEst)
+                    .addComponent(EliminarCon))
+                .addContainerGap(366, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -207,9 +228,51 @@ public class Interfaz extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_ModTiempoActionPerformed
 
+    private void EliminarEstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarEstActionPerformed
+        String id = JOptionPane.showInputDialog(this, "ID de la estación a eliminar:");
+        if (id == null || id.trim().isEmpty()){
+            return;
+        }
+        id = id.trim();
+        
+        if (tablaHash.buscar(id) == null){
+           JOptionPane.showMessageDialog(this, "Ls Estación no existe", "Error", JOptionPane.ERROR_MESSAGE);
+           return;
+        }
+        
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                "Se eliminará la estación" + id + "y todas sus conexiones, ¿Desea Continuar?", 
+                "Confirmar Eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (respuesta != JOptionPane.YES_OPTION){
+            return;
+        }
+        grafo.eliminarVertice(id);
+        tablaHash.eliminar(id);
+        JOptionPane.showMessageDialog(this, "Estación eliminada correctamente");
+    }//GEN-LAST:event_EliminarEstActionPerformed
+
+    private void EliminarConActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EliminarConActionPerformed
+        String origen = JOptionPane.showInputDialog(this, "ID de la primera estación:");
+        if (origen == null || origen.trim().isEmpty()) {
+            return;
+        }
+        String destino = JOptionPane.showInputDialog(this, "ID de la segunda estación:");
+        if (destino == null || destino.trim().isEmpty()) {
+            return;
+        }
+
+        if (grafo.eliminarArista(origen.trim(), destino.trim())) {
+            JOptionPane.showMessageDialog(this, "Conexión eliminada correctamente.");
+        } else {
+            JOptionPane.showMessageDialog(this, "No existe una conexión directa entre esas estaciones.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_EliminarConActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BuscarEst;
+    private javax.swing.JButton EliminarCon;
+    private javax.swing.JButton EliminarEst;
     private javax.swing.JButton ModTiempo;
     private javax.swing.JButton NuevaConexion;
     private javax.swing.JButton NuevaEst;
