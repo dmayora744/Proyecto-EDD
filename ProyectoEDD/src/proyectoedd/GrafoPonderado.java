@@ -141,5 +141,65 @@ public boolean eliminarVertice(String id){
     vertices.eliminar(v);
     return true;
 }
+
+/**
+ * Detecta las subredes (componentes conexos) del grafo usando un recorrido en anchura (BFS).
+ * Una estación sin conexiones forma una subred de una sola estación.
+ *
+ * @return lista de subredes; cada elemento es una ListaEnlazada con los IDs de sus estaciones
+ */
+public ListaEnlazada obtenerSubredes(){
+    //Se desmarcan todos los vértices antes de empezar
+    NodoLista nodo = vertices.getCabeza();
+    while (nodo != null){
+        ((Vertice) nodo.getContenido()).setVisitado(false);
+        nodo = nodo.getSiguiente();
+    }
+
+    ListaEnlazada subredes = new ListaEnlazada();
+
+    //Cada vértice no visitado es el inicio de una subred nueva
+    nodo = vertices.getCabeza();
+    while (nodo != null){
+        Vertice inicio = (Vertice) nodo.getContenido();
+        if (!inicio.isVisitado()){
+            subredes.agregar(recorrerEnAnchura(inicio));
+        }
+        nodo = nodo.getSiguiente();
+    }
+    return subredes;
+}
+
+/**
+ * Recorre en anchura (BFS) todos los vértices alcanzables desde un vértice inicial.
+ *
+ * @param inicio vértice desde el cual comienza el recorrido
+ * @return lista con los IDs de las estaciones alcanzadas (incluido el inicio)
+ */
+private ListaEnlazada recorrerEnAnchura(Vertice inicio){
+    ListaEnlazada componente = new ListaEnlazada();
+    Cola cola = new Cola();
+
+    inicio.setVisitado(true);
+    cola.encolar(inicio);
+
+    while (!cola.estaVacia()){
+        Vertice actual = (Vertice) cola.desencolar();
+        componente.agregar(actual.getIdEstacion());
+
+        NodoLista nodoArista = actual.getAdyacentes().getCabeza();
+        while (nodoArista != null){
+            Arista a = (Arista) nodoArista.getContenido();
+            Vertice vecino = buscarVertice(a.getIdDestino());
+            if (vecino != null && !vecino.isVisitado()){
+                vecino.setVisitado(true);
+                cola.encolar(vecino);
+            }
+            nodoArista = nodoArista.getSiguiente();
+        }
+    }
+    return componente;
+}
+
 }
 

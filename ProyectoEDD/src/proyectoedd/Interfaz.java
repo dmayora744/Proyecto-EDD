@@ -5,6 +5,8 @@
 package proyectoedd;
 
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -48,6 +50,7 @@ public class Interfaz extends javax.swing.JPanel {
         ModTiempo = new javax.swing.JButton();
         EliminarEst = new javax.swing.JButton();
         EliminarCon = new javax.swing.JButton();
+        Subredes = new javax.swing.JButton();
 
         BuscarEst.setText("Buscar Estación");
         BuscarEst.addActionListener(this::BuscarEstActionPerformed);
@@ -66,6 +69,9 @@ public class Interfaz extends javax.swing.JPanel {
 
         EliminarCon.setText("Eliminar Conexión");
         EliminarCon.addActionListener(this::EliminarConActionPerformed);
+
+        Subredes.setText("Detectar Subredes");
+        Subredes.addActionListener(this::SubredesActionPerformed);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -90,6 +96,10 @@ public class Interfaz extends javax.swing.JPanel {
                         .addGap(118, 118, 118)
                         .addComponent(EliminarCon)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(Subredes)
+                .addGap(341, 341, 341))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -104,7 +114,9 @@ public class Interfaz extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(EliminarEst)
                     .addComponent(EliminarCon))
-                .addContainerGap(366, Short.MAX_VALUE))
+                .addGap(44, 44, 44)
+                .addComponent(Subredes)
+                .addContainerGap(299, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -268,6 +280,40 @@ public class Interfaz extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_EliminarConActionPerformed
 
+    private void SubredesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SubredesActionPerformed
+        ListaEnlazada subredes = grafo.obtenerSubredes();
+        if (subredes.getTamano() == 0){
+            JOptionPane.showMessageDialog(this, "No hay una red cargada", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        StringBuilder texto = new StringBuilder();
+        texto.append("Subredes Detectadas: ").append(subredes.getTamano()).append("\n\n");
+        
+        int numero = 1;
+        NodoLista nodo = subredes.getCabeza();
+        while (nodo != null){
+             ListaEnlazada subred = (ListaEnlazada) nodo.getContenido();
+            texto.append("Subred").append(numero).append(" (")
+                    .append(subred.getTamano()).append("estaciones: \n");
+            
+            NodoLista nodoId = subred.getCabeza();
+            while (nodoId != null){
+                String id = (String) nodoId.getContenido();
+                Estacion e = tablaHash.buscar(id);
+                String nombre = (e != null) ? e.getNombre(): id;
+                texto.append(" - ").append(nombre).append("(").append(id).append(")\n");
+                nodoId = nodoId.getSiguiente();
+            }
+            texto.append("\n");
+            numero++;
+            nodo = nodo.getSiguiente();
+         }
+        JTextArea area = new JTextArea(texto.toString(), 18, 40);
+        area.setEditable(false);
+        JOptionPane.showMessageDialog(this, new JScrollPane(area), "Subredes de la red", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_SubredesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BuscarEst;
@@ -276,6 +322,7 @@ public class Interfaz extends javax.swing.JPanel {
     private javax.swing.JButton ModTiempo;
     private javax.swing.JButton NuevaConexion;
     private javax.swing.JButton NuevaEst;
+    private javax.swing.JButton Subredes;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
