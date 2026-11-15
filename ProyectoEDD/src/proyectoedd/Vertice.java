@@ -55,4 +55,13 @@ public boolean isVisitado(){
 public void setVisitado(boolean visitado){
     this.visitado = visitado;
 }
+
+/**
+ * Devuelve el grado del vértice: la cantidad de conexiones directas que tiene.
+ *
+ * @return número de aristas incidentes al vértice
+ */
+public int getGrado(){
+    return adyacentes.getTamano();
+}
 }

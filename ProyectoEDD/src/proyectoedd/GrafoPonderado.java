@@ -200,6 +200,41 @@ private ListaEnlazada recorrerEnAnchura(Vertice inicio){
     }
     return componente;
 }
+/**
+ * Identifica los hubs de transferencia: las estaciones con mayor grado
+ * (mayor número de conexiones directas), ordenadas de mayor a menor.
+ *
+ * @param cantidad cantidad máxima de estaciones a devolver
+ * @return lista de vértices ordenada por grado descendente
+ */
+public ListaEnlazada obtenerHubs(int cantidad){
+    //Se desmarcan todos los vértices antes de empezar
+    NodoLista nodo = vertices.getCabeza();
+    while (nodo != null){
+        ((Vertice) nodo.getContenido()).setVisitado(false);
+        nodo = nodo.getSiguiente();
+    }
 
+    ListaEnlazada hubs = new ListaEnlazada();
+
+    //En cada vuelta se elige el vértice de mayor grado entre los aún no elegidos
+    for (int i = 0; i < cantidad; i++){
+        Vertice mejor = null;
+        nodo = vertices.getCabeza();
+        while (nodo != null){
+            Vertice v = (Vertice) nodo.getContenido();
+            if (!v.isVisitado() && (mejor == null || v.getGrado() > mejor.getGrado())){
+                mejor = v;
+            }
+            nodo = nodo.getSiguiente();
+        }
+        if (mejor == null){
+            break;
+        }
+        mejor.setVisitado(true);
+        hubs.agregar(mejor);
+    }
+    return hubs;
+}
 }
 

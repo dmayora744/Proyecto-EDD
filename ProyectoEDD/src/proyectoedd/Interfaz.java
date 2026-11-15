@@ -51,6 +51,7 @@ public class Interfaz extends javax.swing.JPanel {
         EliminarEst = new javax.swing.JButton();
         EliminarCon = new javax.swing.JButton();
         Subredes = new javax.swing.JButton();
+        Hubs = new javax.swing.JButton();
 
         BuscarEst.setText("Buscar Estación");
         BuscarEst.addActionListener(this::BuscarEstActionPerformed);
@@ -73,50 +74,59 @@ public class Interfaz extends javax.swing.JPanel {
         Subredes.setText("Detectar Subredes");
         Subredes.addActionListener(this::SubredesActionPerformed);
 
+        Hubs.setText("Identificar Hubs");
+        Hubs.addActionListener(this::HubsActionPerformed);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(60, 60, 60)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(EliminarEst)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(BuscarEst)
-                        .addGap(72, 72, 72)
-                        .addComponent(NuevaEst)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
-                        .addComponent(NuevaConexion)
-                        .addGap(53, 53, 53)
-                        .addComponent(ModTiempo)
-                        .addGap(49, 49, 49))
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(BuscarEst)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(EliminarCon))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(NuevaEst)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(NuevaConexion))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(118, 118, 118)
-                        .addComponent(EliminarCon)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap()
+                        .addComponent(EliminarEst)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap(162, Short.MAX_VALUE)
+                .addComponent(ModTiempo)
+                .addGap(66, 66, 66)
                 .addComponent(Subredes)
-                .addGap(341, 341, 341))
+                .addGap(76, 76, 76)
+                .addComponent(Hubs)
+                .addGap(127, 127, 127))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(48, 48, 48)
+                .addGap(22, 22, 22)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ModTiempo)
+                    .addComponent(Subredes)
+                    .addComponent(Hubs))
+                .addGap(17, 17, 17)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(NuevaEst)
+                    .addComponent(NuevaConexion))
+                .addGap(33, 33, 33)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BuscarEst)
-                    .addComponent(NuevaEst)
-                    .addComponent(NuevaConexion)
-                    .addComponent(ModTiempo))
-                .addGap(94, 94, 94)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(EliminarEst)
                     .addComponent(EliminarCon))
-                .addGap(44, 44, 44)
-                .addComponent(Subredes)
-                .addContainerGap(299, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(EliminarEst)
+                .addContainerGap(372, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -314,11 +324,37 @@ public class Interfaz extends javax.swing.JPanel {
         JOptionPane.showMessageDialog(this, new JScrollPane(area), "Subredes de la red", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_SubredesActionPerformed
 
+    private void HubsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HubsActionPerformed
+        ListaEnlazada hubs = grafo.obtenerHubs(5);
+    if (hubs.getTamano() == 0) {
+        JOptionPane.showMessageDialog(this, "No hay una red cargada.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    StringBuilder texto = new StringBuilder();
+    texto.append("Estaciones con más conexiones directas (hubs):\n\n");
+
+    int posicion = 1;
+    NodoLista nodo = hubs.getCabeza();
+    while (nodo != null) {
+        Vertice v = (Vertice) nodo.getContenido();
+        Estacion e = tablaHash.buscar(v.getIdEstacion());
+        String nombre = (e != null) ? e.getNombre() : v.getIdEstacion();
+        texto.append(posicion).append(". ").append(nombre)
+             .append(" (").append(v.getIdEstacion()).append(") - ")
+             .append(v.getGrado()).append(" conexiones\n");
+        posicion++;
+        nodo = nodo.getSiguiente();
+    }
+    JOptionPane.showMessageDialog(this, texto.toString(), "Hubs de transferencia", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_HubsActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BuscarEst;
     private javax.swing.JButton EliminarCon;
     private javax.swing.JButton EliminarEst;
+    private javax.swing.JButton Hubs;
     private javax.swing.JButton ModTiempo;
     private javax.swing.JButton NuevaConexion;
     private javax.swing.JButton NuevaEst;
