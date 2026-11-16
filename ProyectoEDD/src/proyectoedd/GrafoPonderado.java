@@ -236,5 +236,83 @@ public ListaEnlazada obtenerHubs(int cantidad){
     }
     return hubs;
 }
+/**
+ * Calcula la ruta de menor tiempo entre dos estaciones con el algoritmo de Dijkstra.
+ *
+ * @param idOrigen  ID de la estación de partida
+ * @param idDestino ID de la estación de llegada
+ * @return la ruta encontrada, o null si alguna estación no existe o no hay camino entre ellas
+ */
+public Ruta rutaMinima(String idOrigen, String idDestino){
+    Vertice origen = buscarVertice(idOrigen);
+    Vertice destino = buscarVertice(idDestino);
+    if (origen == null || destino == null){
+        return null;
+    }
+
+    //Inicialización: distancia infinita, sin anterior y ningún vértice definitivo
+    NodoLista nodo = vertices.getCabeza();
+    while (nodo != null){
+        Vertice v = (Vertice) nodo.getContenido();
+        v.setDistancia(Integer.MAX_VALUE);
+        v.setAnterior(null);
+        v.setVisitado(false);
+        nodo = nodo.getSiguiente();
+    }
+    origen.setDistancia(0);
+
+    while (true){
+        //Se elige el vértice no definitivo con menor distancia conocida
+        Vertice actual = null;
+        nodo = vertices.getCabeza();
+        while (nodo != null){
+            Vertice v = (Vertice) nodo.getContenido();
+            if (!v.isVisitado() && v.getDistancia() != Integer.MAX_VALUE
+                    && (actual == null || v.getDistancia() < actual.getDistancia())){
+                actual = v;
+            }
+            nodo = nodo.getSiguiente();
+        }
+
+        //Si no queda ninguno alcanzable, o ya llegamos al destino, se termina
+        if (actual == null || actual == destino){
+            break;
+        }
+        actual.setVisitado(true);
+
+        //Relajación: se intenta mejorar la distancia de cada vecino pasando por "actual"
+        NodoLista nodoArista = actual.getAdyacentes().getCabeza();
+        while (nodoArista != null){
+            Arista a = (Arista) nodoArista.getContenido();
+            Vertice vecino = buscarVertice(a.getIdDestino());
+            if (vecino != null && !vecino.isVisitado()){
+                int nueva = actual.getDistancia() + a.getTiempoMinutos();
+                if (nueva < vecino.getDistancia()){
+                    vecino.setDistancia(nueva);
+                    vecino.setAnterior(actual);
+                }
+            }
+            nodoArista = nodoArista.getSiguiente();
+        }
+    }
+
+    //Si el destino sigue con distancia infinita, no hay camino
+    if (destino.getDistancia() == Integer.MAX_VALUE){
+        return null;
+    }
+
+    //Se reconstruye el camino hacia atrás con una pila, para obtenerlo de origen a destino
+    Pila pila = new Pila();
+    Vertice paso = destino;
+    while (paso != null){
+        pila.apilar(paso.getIdEstacion());
+        paso = paso.getAnterior();
+    }
+    ListaEnlazada camino = new ListaEnlazada();
+    while (!pila.estaVacia()){
+        camino.agregar(pila.desapilar());
+    }
+    return new Ruta(camino, destino.getDistancia());
+}
 }
 

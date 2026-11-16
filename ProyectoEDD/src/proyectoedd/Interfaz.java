@@ -21,6 +21,15 @@ public class Interfaz extends javax.swing.JPanel {
      */
         public Interfaz(TablaHash tablaHash, GrafoPonderado grafo) {
             initComponents();
+            
+             // Reorganiza los botones en una cuadrícula de 2 filas
+            java.awt.Component[] botones = jPanel1.getComponents();
+            jPanel1.removeAll();
+            jPanel1.setLayout(new java.awt.GridLayout(2, 0, 8, 8));
+            for (int i = 0; i < botones.length; i++) {
+                jPanel1.add(botones[i]);
+            }
+            
             this.tablaHash = tablaHash;
             this.grafo = grafo;
    
@@ -28,12 +37,27 @@ public class Interfaz extends javax.swing.JPanel {
         
     public Interfaz() {
         initComponents();
+        
 }
 
     public void setEstructuras(TablaHash tablaHash, GrafoPonderado grafo){
         this.tablaHash = tablaHash;
         this.grafo = grafo;
+        refrescarGrafo();
     }
+    
+    private PanelGrafo panelGrafo;   // referencia al visor del grafo
+
+public void setPanelGrafo(PanelGrafo panelGrafo) {
+    this.panelGrafo = panelGrafo;
+    refrescarGrafo();
+}
+
+public void refrescarGrafo() {
+    if (panelGrafo != null) {           // por si el visor aún no está conectado
+        panelGrafo.setGrafo(grafo);     // vuelve a dibujar con el grafo actual
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -52,6 +76,7 @@ public class Interfaz extends javax.swing.JPanel {
         EliminarCon = new javax.swing.JButton();
         Subredes = new javax.swing.JButton();
         Hubs = new javax.swing.JButton();
+        RutaOptima = new javax.swing.JButton();
 
         BuscarEst.setText("Buscar Estación");
         BuscarEst.addActionListener(this::BuscarEstActionPerformed);
@@ -76,6 +101,9 @@ public class Interfaz extends javax.swing.JPanel {
 
         Hubs.setText("Identificar Hubs");
         Hubs.addActionListener(this::HubsActionPerformed);
+
+        RutaOptima.setText("Ruta Optima");
+        RutaOptima.addActionListener(this::RutaOptimaActionPerformed);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -107,6 +135,10 @@ public class Interfaz extends javax.swing.JPanel {
                 .addGap(76, 76, 76)
                 .addComponent(Hubs)
                 .addGap(127, 127, 127))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(212, 212, 212)
+                .addComponent(RutaOptima)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -126,7 +158,9 @@ public class Interfaz extends javax.swing.JPanel {
                     .addComponent(EliminarCon))
                 .addGap(18, 18, 18)
                 .addComponent(EliminarEst)
-                .addContainerGap(372, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 343, Short.MAX_VALUE)
+                .addComponent(RutaOptima)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -349,6 +383,59 @@ public class Interfaz extends javax.swing.JPanel {
     JOptionPane.showMessageDialog(this, texto.toString(), "Hubs de transferencia", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_HubsActionPerformed
 
+    private void RutaOptimaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RutaOptimaActionPerformed
+        String idOrigen = JOptionPane.showInputDialog(this, "ID de la estación de origen:");
+    if (idOrigen == null || idOrigen.trim().isEmpty()) {
+        return;
+    }
+    String idDestino = JOptionPane.showInputDialog(this, "ID de la estación de destino:");
+    if (idDestino == null || idDestino.trim().isEmpty()) {
+        return;
+    }
+
+    Estacion origen = tablaHash.buscar(idOrigen.trim());
+    Estacion destino = tablaHash.buscar(idDestino.trim());
+    if (origen == null || destino == null) {
+        JOptionPane.showMessageDialog(this, "Una o ambas estaciones no existen.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    if (origen == destino) {
+        JOptionPane.showMessageDialog(this, "El origen y el destino son la misma estación.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    Ruta ruta = grafo.rutaMinima(origen.getID(), destino.getID());
+    if (ruta == null) {
+        JOptionPane.showMessageDialog(this,
+                "No existe ruta entre " + origen.getNombre() + " y " + destino.getNombre()
+                + ".\nLas estaciones están en subredes distintas.",
+                "Sin ruta", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    StringBuilder texto = new StringBuilder();
+    texto.append("Ruta de menor tiempo: ").append(origen.getNombre())
+         .append(" → ").append(destino.getNombre()).append("\n");
+    texto.append("Tiempo total: ").append(ruta.getTiempoTotal()).append(" minutos\n");
+    texto.append("Estaciones recorridas: ").append(ruta.getEstaciones().getTamano()).append("\n\n");
+
+    int paso = 1;
+    NodoLista nodo = ruta.getEstaciones().getCabeza();
+    while (nodo != null) {
+        String id = (String) nodo.getContenido();
+        Estacion e = tablaHash.buscar(id);
+        String nombre = (e != null) ? e.getNombre() : id;
+        texto.append(paso).append(". ").append(nombre).append(" (").append(id).append(")\n");
+        paso++;
+        nodo = nodo.getSiguiente();
+    }
+
+    JTextArea area = new JTextArea(texto.toString(), 18, 40);
+    area.setEditable(false);
+    JOptionPane.showMessageDialog(this, new JScrollPane(area), "Ruta óptima", JOptionPane.INFORMATION_MESSAGE);
+
+    }//GEN-LAST:event_RutaOptimaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BuscarEst;
@@ -358,6 +445,7 @@ public class Interfaz extends javax.swing.JPanel {
     private javax.swing.JButton ModTiempo;
     private javax.swing.JButton NuevaConexion;
     private javax.swing.JButton NuevaEst;
+    private javax.swing.JButton RutaOptima;
     private javax.swing.JButton Subredes;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables

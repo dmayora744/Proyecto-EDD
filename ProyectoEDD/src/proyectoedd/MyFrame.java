@@ -11,6 +11,8 @@ import javax.swing.JOptionPane;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
 
 public class MyFrame extends JFrame implements ActionListener{
     
@@ -27,33 +29,45 @@ public class MyFrame extends JFrame implements ActionListener{
     //Bandera booleana para las sobresctrituras
     private boolean hayDatosEnMemoria;
     
+    private PanelGrafo panelGrafo;
+    
     public MyFrame(){
-        
-        buttonGuardar = new JButton("Guardar Red a CSV");
-        buttonGuardar.addActionListener(this);
-        this.add(buttonGuardar);
-        //Inicio de las estructuras de datos vacías al arrancar la ventana
-        this.tablaHash = new TablaHash(101);
-        this.grafo = new GrafoPonderado();
-        this.hayDatosEnMemoria = false;
-        
-        //Interfaz gráfica al JFrame
-        panelInterfaz = new Interfaz(this.tablaHash, this.grafo);
-        this.add(panelInterfaz);
-        
-        //Configuración básica del JFrame
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new FlowLayout());
-        this.setTitle("Urban Route - Red Multimodal");
-        
-        //Configuración del botón
-        buttonCargar = new JButton("Cargar Archivo CSV");
-        buttonCargar.addActionListener(this);
-        
-        this.add(buttonCargar);
-        this.pack();
-        this.setLocationRelativeTo(null); //Centrar la ventana en pantalla
-    }
+    //Estructuras de datos vacías al arrancar la ventana
+    this.tablaHash = new TablaHash(101);
+    this.grafo = new GrafoPonderado();
+    this.hayDatosEnMemoria = false;
+
+    //Configuración básica del JFrame (el layout se define ANTES de agregar componentes)
+    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    this.setLayout(new BorderLayout());
+    this.setTitle("Urban Route - Red Multimodal");
+
+    //Botones de archivo, arriba
+    JPanel panelTop = new JPanel();
+
+    buttonCargar = new JButton("Cargar Archivo CSV");
+    buttonCargar.addActionListener(this);
+    panelTop.add(buttonCargar);
+
+    buttonGuardar = new JButton("Guardar Red a CSV");
+    buttonGuardar.addActionListener(this);
+    panelTop.add(buttonGuardar);
+
+    this.add(panelTop, BorderLayout.NORTH);
+
+    //Visor del grafo en el centro
+    panelGrafo = new PanelGrafo(this.grafo);
+    this.add(panelGrafo, BorderLayout.CENTER);
+
+    //Botones de operaciones, abajo
+    panelInterfaz = new Interfaz(this.tablaHash, this.grafo);
+    panelInterfaz.setPanelGrafo(panelGrafo);
+    panelInterfaz.setPreferredSize(new java.awt.Dimension(1100, 110));
+    this.add(panelInterfaz, BorderLayout.SOUTH);
+
+    this.setSize(1100, 760);
+    this.setLocationRelativeTo(null);   //centra la ventana en pantalla
+}
     //Alerta de datos
     public boolean verificarCambiosSinGuardar(){ 
         if(hayDatosEnMemoria){

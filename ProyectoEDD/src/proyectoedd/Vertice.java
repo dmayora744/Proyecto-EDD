@@ -14,6 +14,8 @@ class Vertice {
     private String idEstacion;
     private ListaEnlazada adyacentes;
     private boolean visitado;
+    private int distancia;
+private Vertice anterior;
     
     public Vertice(String idEstacion){
         this.idEstacion = idEstacion;
@@ -63,5 +65,40 @@ public void setVisitado(boolean visitado){
  */
 public int getGrado(){
     return adyacentes.getTamano();
+}
+/**
+ * Devuelve la distancia (tiempo mínimo conocido) desde el origen de la búsqueda.
+ *
+ * @return distancia en minutos
+ */
+public int getDistancia(){
+    return distancia;
+}
+
+/**
+ * Establece la distancia desde el origen de la búsqueda.
+ *
+ * @param distancia nueva distancia en minutos
+ */
+public void setDistancia(int distancia){
+    this.distancia = distancia;
+}
+
+/**
+ * Devuelve el vértice previo en el camino más corto encontrado.
+ *
+ * @return vértice anterior, o null si no tiene
+ */
+public Vertice getAnterior(){
+    return anterior;
+}
+
+/**
+ * Establece el vértice previo en el camino más corto.
+ *
+ * @param anterior vértice previo
+ */
+public void setAnterior(Vertice anterior){
+    this.anterior = anterior;
 }
 }
